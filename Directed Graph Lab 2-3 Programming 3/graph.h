@@ -14,11 +14,12 @@ namespace graphs
         {
         public:
         bool ADDVERTEX(int n);
-        bool REMOVEVERTEX(int n);
-        bool ADDEDGE(int n1, int n2, const int flag = 0);
-        bool REMOVEEDGE(int n1, int n2, const int flag = 0);
+        bool REMOVEVERTEX(int n, int flag = 0);
+        bool ADDEDGE(int n1, int n2, int flag = 0);
+        bool REMOVEEDGE(int n1, int n2, int flag = 0);
         std::vector<int> nodes();
         std::vector<std::pair<int,int>> out_edges(int n);
+        void BFS(); // Breadth First Search algorithm
         };
 }
 
