@@ -20,6 +20,7 @@ namespace graphs
         std::vector<int> nodes();
         std::vector<std::pair<int,int>> out_edges(int n);
         void BFS(); // Breadth First Search algorithm
+        void DFS(); // Depth-first search
         };
 }
 

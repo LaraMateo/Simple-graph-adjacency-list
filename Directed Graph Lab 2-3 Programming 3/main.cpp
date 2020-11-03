@@ -30,5 +30,5 @@ int main()
     g1.ADDEDGE(2, 15);
     g1.ADDEDGE(3, 4);
     g1.ADDEDGE(4, 5);
-    g1.BFS();
+    g1.DFS();
 }
