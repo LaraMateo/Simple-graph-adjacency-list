@@ -7,6 +7,8 @@
 #include<map>
 #include <unordered_set>
 #include <unordered_map>
+#include <set>
+#include <tuple>
 
 namespace graphs
 {
@@ -21,6 +23,8 @@ namespace graphs
         std::vector<std::pair<int,int>> out_edges(int n);
         void BFS(); // Breadth First Search algorithm
         void DFS(); // Depth-first search
+        void Connectivity();
+        bool Cycle4();
         };
 }
 

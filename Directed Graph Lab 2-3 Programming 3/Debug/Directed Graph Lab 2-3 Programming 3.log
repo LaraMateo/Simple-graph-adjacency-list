@@ -1,2 +1,3 @@
-﻿  graph.cpp
-  Directed Graph Lab 2-3 Programming 3.vcxproj -> C:\Users\mateo\Source\Repos\ADS (C++)\Simple graph adjacency list lab2\Debug\Directed Graph Lab 2-3 Programming 3.exe
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (Simple graph adjacency list lab2-3.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  main.cpp
+  Directed Graph Lab 2-3 Programming 3.vcxproj -> C:\Users\mateo\Source\Repos\ADS (C++)\Simple graph adjacency list lab2-3\Debug\Directed Graph Lab 2-3 Programming 3.exe

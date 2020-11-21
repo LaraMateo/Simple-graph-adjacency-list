@@ -168,6 +168,7 @@ namespace graphs
 		vector<int>::iterator it1;
 		vector<int> order_nodes = {};
 		int key;
+		int number_of_components;
 
 		// Create an order vector of the nodes in the graph -> order_nodes
 		for (it = vertices_edges.begin(); it != vertices_edges.end(); it++) {
@@ -189,15 +190,27 @@ namespace graphs
 			}
 		}
 
-		int starting_node = order_nodes[0];
-		vector<int> nodes_to_search = {starting_node};
+		int starting_node;
+		vector<int> nodes_to_search;
+		if (!order_nodes.empty()) {
+			starting_node = order_nodes[0];
+			nodes_to_search = { starting_node };
 
-		cout << "-------------------- BGS -------------------- \n";
-		cout << "Order of search:  \n";
+			cout << "-------------------- BGS -------------------- \n";
+			cout << "Order of search:  \n";
+			number_of_components = 1;
+		}
+		else {
+			cout << "-------------------- BGS -------------------- \n";
+			cout << "The graph is empty  \n";
+			number_of_components = 0;
+		}
+
 		while(!order_nodes.empty()) {
 
 			if (nodes_to_search.empty()) {
 				nodes_to_search = { order_nodes[0] };
+				number_of_components++;
 			}
 
 
@@ -256,6 +269,7 @@ namespace graphs
 		}
 		vertices_edges = copy_vertices_edges;
 		cout << "\n";
+		cout << "\nThe graph has " << number_of_components << " component(s) \n";
 	}
 
 	void graph::DFS() {
@@ -286,16 +300,30 @@ namespace graphs
 			}
 		}
 
-		int starting_node = order_nodes[0];
-		vector<int> nodes_to_search = { starting_node };
+		int starting_node;
+		int number_of_components;
+		set<tuple<int, int>> edges;
+		vector<int> nodes_to_search;
+		if (!order_nodes.empty()) {
+			starting_node = order_nodes[0];
+			nodes_to_search = { starting_node };
 
-		cout << "-------------------- DFS -------------------- \n";
-		cout << "Order of search:  \n";
+			cout << "-------------------- DFS -------------------- \n";
+			cout << "Order of search:  \n";
+			number_of_components = 1;
+		}
+		else {
+			cout << "-------------------- DFS -------------------- \n";
+			cout << "The graph is empty  \n";
+			number_of_components = 0;
+		}
+
 
 		while (!order_nodes.empty()) {
 
 			if (nodes_to_search.empty()) {
 				nodes_to_search = { order_nodes[0] };
+				number_of_components++;
 			}
 
 			int current_node = nodes_to_search[0];
@@ -303,20 +331,19 @@ namespace graphs
 			list<int>::iterator it;
 			vector<int>::iterator it1;
 			vector<int> order_child_nodes = {};
-			bool flag = false;
 
 			// Create an order vector of child nodes connected to current node  -> order_child_nodes
 			for (it = child_nodes.begin(); it != child_nodes.end(); it++) {
 				int element = *it;
+				edges.insert(make_tuple(current_node, element));
 				for (it1 = nodes_to_search.begin(); it1 != nodes_to_search.end(); it1++) {
+					// Delete the nodes in nodes to search that are child nodes of current node
+					// This avoid unnecessary repetitions in nodes to search
 					int node = *it1;
 					if (element == node) {
-						flag = true;
+						nodes_to_search.erase(it1);
 						break;
 					}
-				}
-				if (flag) {
-					continue;
 				}
 				if (order_child_nodes.empty()) {
 					order_child_nodes.push_back(element);
@@ -335,7 +362,7 @@ namespace graphs
 				}
 			}
 
-			nodes_to_search.insert(nodes_to_search.begin()+1 , order_child_nodes.begin(), order_child_nodes.end());
+			nodes_to_search.insert(nodes_to_search.begin() + 1, order_child_nodes.begin(), order_child_nodes.end());
 			if (current_node == starting_node) {
 				cout << current_node;
 			}
@@ -353,5 +380,116 @@ namespace graphs
 		}
 		vertices_edges = copy_vertices_edges;
 		cout << "\n";
+		cout << "\nThe graph has " << number_of_components << " component(s) \n";
+		if (number_of_components == 1) {
+			cout << "The graph is connected " << "\n";
+
+			cout << "Spanning tree of the graph:  " << "\n";
+			// Calculate spanning tree
+			set<tuple<int, int>>::iterator it3;
+			set<tuple<int, int>>::iterator it4;
+			bool repeated;
+			for (it3 = edges.begin(); it3 != edges.end(); ++it3) {
+				repeated = false;
+				it4 = edges.find(*it3);
+				for (it4.operator++(); it4 != edges.end(); ++it4) {
+					if (get<1>(*it3) == get<1>(*it4)) {
+						repeated = true;
+						break;
+					}
+				}
+				if (!repeated) {
+					cout << " { " << get<0>(*it3) << " , " << get<1>(*it3) << " } ";
+				}
+			}
+		}
+		else if (number_of_components > 1) {
+			cout << "The graph is NOT connected (NO spanning tree) " << "\n";
+		}
+		cout << "\n\n";
+	}
+
+	void graph::Connectivity() {
+		int vertex_degree;
+		bool eulerian = true;
+		map<int, int> vertices_degree;
+		map<int, list<int>>::iterator it;
+		for (it = vertices_edges.begin(); it != vertices_edges.end(); it++) {
+			vertex_degree = it->second.size();
+			vertices_degree.insert(pair<int, int>(it->first, vertex_degree));
+		}
+
+		map<int, int>::iterator it2;
+		for (it2 = vertices_degree.begin(); it2 != vertices_degree.end(); it2++) {
+			if (it2->second % 2 != 0) {
+				eulerian = false;
+			}
+			cout << "Vertex " << it2->first << " has degree of " << it2->second << "\n";
+		}
+
+		if (eulerian) {
+			cout << "\nThe graph is Eulerian \n";
+		}
+		else {
+			cout << "\nThe graph is NOT Eulerian \n";
+		}
+	}
+
+	bool graph::Cycle4() {
+		map<int, list<int>>::iterator it;
+		map<int, list<int>> copy_vertices_edges = vertices_edges;
+		bool cycle = false;
+		for (it = vertices_edges.begin(); it != vertices_edges.end(); it++) {
+			list<int>::iterator it2;
+			for (it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+				map<int, list<int>>::iterator it3 = vertices_edges.find(*it2);
+				list<int>::iterator it4;
+				for (it4 = it3->second.begin(); it4 != it3->second.end(); it4++) {
+					if (*it4 == it->first) {
+						continue;
+					}
+					map<int, list<int>>::iterator it5 = vertices_edges.find(*it4);
+					list<int>::iterator it6;
+					for (it6 = it5->second.begin(); it6 != it5->second.end(); it6++) {
+						if (*it6 == it->first || *it6 == *it2) {
+							continue;
+						}
+						map<int, list<int>>::iterator it7 = vertices_edges.find(*it6);
+						list<int>::iterator it8;
+						for (it8 = it7->second.begin(); it8 != it7->second.end(); it8++) {
+							if (*it8 == *it4) {
+								continue;
+							}
+							if (*it8 == it->first) {
+								bool inner_connected = false;
+								map<int, list<int>>::iterator it9 = vertices_edges.find(it->first);
+								list<int>::iterator it10;
+								map<int, list<int>>::iterator it11 = vertices_edges.find(*it6);
+								list<int>::iterator it12;
+								for (it10 = it9->second.begin(); it10 != it9->second.end(); it10++) {
+									if (*it10 == *it4) {
+										inner_connected = true;
+									}
+								}
+								for (it12 = it11->second.begin(); it12 != it11->second.end(); it12++) {
+									if (*it12 == *it2) {
+										inner_connected = true;
+									}
+								}
+								if (!inner_connected) {
+									cycle = true;
+									cout << "YES, given graph contains cycle of length 4 as induced subgraph formed by the following vertices: " << it->first << " " << *it2 << " " << *it4 << " " << *it6 << " \n";
+									return(cycle);
+								}
+							}
+						}
+					}
+				}
+			}
+			//REMOVEVERTEX(it->first);
+		}
+		vertices_edges = copy_vertices_edges;
+		cout << "NO, there exists no cycle of length 4 as induced subgraph in given graph \n";
+		return(cycle);
 	}
 }
